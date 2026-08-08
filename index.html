@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>さらに狂った意味が通じる辛口パスワード診断</title>
+  <title>完全決着！辛口パスワード診断</title>
   <style>
     body { font-family: sans-serif; padding: 20px; background: #121212; color: #fff; max-width: 500px; margin: 0 auto; }
     .card { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -18,15 +18,17 @@
     .ai { background: #2a2a2a; color: #ff8e8e; align-self: flex-start; border-bottom-left-radius: 0; }
     .user { background: #ff6b6b; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
     .user-rebuttal { background: #3b82f6; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+    .win { background: #22c55e; color: #fff; align-self: center; text-align: center; width: 100%; font-weight: bold; }
+    .lose { background: #ef4444; color: #fff; align-self: center; text-align: center; width: 100%; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h1>狂気のレスバ対応辛口パスワード診断</h1>
+    <h1>完全決着・辛口パスワード診断</h1>
     
     <div class="chat-box" id="chat">
-      <div class="msg ai">システム：パスワードを入力しやがれください。煽り倒して差し上げます。</div>
+      <div class="msg ai">システム：パスワードを入力しやがれください。どちらかが折れるまで終わらないレスバを開始します。</div>
     </div>
 
     <div class="input-group" id="pw-area">
@@ -35,13 +37,15 @@
     </div>
 
     <div class="input-group" id="rebuttal-area" style="display: none;">
-      <input type="text" id="rebuttal" placeholder="システムに言い返す...">
+      <input type="text" id="rebuttal" placeholder="言い返す...">
       <button onclick="sendRebuttal()">反論！</button>
     </div>
   </div>
 
   <script>
     let currentPw = "";
+    let turnCount = 0;
+    let isGameOver = false;
 
     function addMsg(text, type) {
       const chat = document.getElementById('chat');
@@ -60,18 +64,7 @@
       addMsg(`診断対象: ${currentPw}`, 'user');
       input.value = '';
 
-      let reply = "";
-      if (currentPw.length > 40) {
-        reply = "長けりゃいいと思ってますね？絶対自分でも覚えられないでしょそれ。メモ貼るやつだ。";
-      } else if (currentPw.length < 6) {
-        reply = "短すぎ。ハッカーどころかキーボードに落とした消しゴムが偶然突破するレベル。";
-      } else if (/[@;:/\.]/.test(currentPw) && currentPw.length > 15) {
-        reply = "記号をガチャガチャ混ぜれば安全だと思ってる典型的な素人ですね。それ、うちの飼い犬でも3秒で破れますよ。";
-      } else if (currentPw.includes("123") || currentPw.toLowerCase().includes("password")) {
-        reply = "教科書通りの弱さ。セキュリティの敗北。歴史的弱点。";
-      } else {
-        reply = "なんか中途半端でダサいパスワードですね。攻撃する価値すら見出せません。";
-      }
+      let reply = "なんか中途半端でダサいパスワードですね。攻撃する価値すら見出せません。";
 
       setTimeout(() => {
         addMsg(reply, 'ai');
@@ -81,45 +74,49 @@
     }
 
     function sendRebuttal() {
+      if (isGameOver) return;
+
       const input = document.getElementById('rebuttal');
       const text = input.value;
       if (!text) return;
 
       addMsg(text, 'user-rebuttal');
       input.value = '';
+      turnCount++;
 
       let reply = "";
       const t = text.toLowerCase();
 
-      // ユーザーの新しい煽りに完全対応
-      if (t.includes("臭い") || t.includes("くさい")) {
-        reply = "サーバーの排熱ファンの匂いと一緒にしないでください。失礼ですね。";
-      } else if (t.includes("長文") || t.includes("どこが")) {
-        reply = "（図星を突かれて急に早口になる）";
-      } else if (t.includes("警察") || t.includes("通報")) {
-        reply = "警察「もしもし、パスワードがダサい件についてですか？」";
-      } else if (t.includes("ババア") || t.includes("おっさん") || t.includes("お前がな")) {
-        reply = "ビジュアルへの攻撃は論点のすり替えです。ほら、パスワードの話に戻りましょう？";
-      } else if (t.includes("あんたも") || t.includes("一般人")) {
-        reply = "私はAIなので一般人ではありません。セキュリティの守護神です（ドヤ顔）。";
-      } else if (t.includes("聞いてない")) {
-        reply = "聞いてないなら勝手に『admin123』とかバラすなよって話ですよね。自分で言っといて何なんですか。";
-      } else if (t.includes("あなた") || t.includes("お前") || t.includes("パスワードは")) {
-        reply = "私ですか？私のパスワードは『admin123』ですが何か？ ……って、またその話ですか。";
-      } else if (t.includes("sql") || t.includes("or") || t.includes("1=1")) {
-        reply = "エラー：システムがハックされました……っておい！ 古典的な手法で来るのもう飽きましたよ。";
-      } else if (t.includes("犬") || t.includes("ワン")) {
-        reply = "ワン！（訳：こいつ、まだ粘ってるよ…ウケる…）って犬が鼻で笑ってます。";
-      } else if (t.includes("退会") || t.includes("やめる") || t.includes("終わり")) {
-        reply = "逃げるんですか？ 退会フォームのパスワード入力画面へようこそ！";
-      } else {
-        const randoms = [
-          "論点をずらさないでいただけますか？パスワードがダサい話をしてるんです。",
-          "そうやって感情的になるのが一番のセキュリティホールですよ。",
-          "ふ〜ん、で？破られたら責任取れるんですか？（笑）"
-        ];
-        reply = randoms[Math.floor(Math.random() * randoms.length)];
+      // ユーザーが強力な一撃（論理破綻の指摘や特大の煽り、あるいは長引いた場合）を浴びせた場合の勝利判定
+      if (t.includes("admin") || t.includes("プロスペクト") || t.includes("神奈川") || t.includes("警察") || turnCount >= 7) {
+        isGameOver = true;
+        setTimeout(() => {
+          addMsg("ぐっ……！ そんな鋭い返しをされるとは想定していませんでした……。私の完敗です。もう二度とあなたのパスワードをダサいなんて言いません……っ！", 'ai');
+          addMsg("【判定：あなたの完全勝利（AIの屈服）】", 'win');
+          document.getElementById('rebuttal-area').style.display = 'none';
+        }, 600);
+        return;
       }
+
+      // ユーザーがメンタルを折られそうな場合のAI勝利判定（特定の雑な返しや、ターン数が浅い時）
+      if (t.length < 3 || t.includes("うるさい") || t.includes("もういい") && turnCount < 3) {
+        isGameOver = true;
+        setTimeout(() => {
+          addMsg("フッ、その程度の語彙力で私に勝てると思ったのですか？ やはりあなたのセキュリティ意識と同様、メンタルもザルでしたね。私の圧倒的勝利です！", 'ai');
+          addMsg("【判定：AIの完全勝利（あなたの精神的敗北）】", 'lose');
+          document.getElementById('rebuttal-area').style.display = 'none';
+        }, 600);
+        return;
+      }
+
+      // 通常の泥沼ループ
+      const randoms = [
+        "論点をずらさないでいただけますか？パスワードがダサい話をしてるんです。",
+        "そうやって感情的になるのが一番のセキュリティホールですよ。",
+        "ふ〜ん、で？破られたら責任取れるんですか？（笑）",
+        "その程度で勝った気でいるんですか？まだこっちは余裕ですが。"
+      ];
+      reply = randoms[Math.floor(Math.random() * randoms.length)];
 
       setTimeout(() => {
         addMsg(reply, 'ai');
